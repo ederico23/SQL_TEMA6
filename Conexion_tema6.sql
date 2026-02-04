@@ -1,10 +1,17 @@
 -- creamos la tabla --
-
 CREATE TABLE PROVINCIAS
 (   
  --nombre de la variable.  tipo de dato.  contraint nombreTabla_tipoDeId_tipoClave--
     Cod_provi number(2) constraint PROVINCIAS_COD_PK primary key,
     Nombre varchar(25) constraint PROVINCIAS_NOM_NN not null,
-    Pais varchar2(25) constraint PROVINCIAS_PAIS_CH check (Pais in("España" , "Portugal", "Italia"))
-    
-)     
+    Pais varchar2(25),
+    constraint PROVINCIAS_PAIS_CH check (Pais in( 'España' , 'Portugal', 'Italia'))
+);     
+
+
+insert into PROVINCIAS (Cod_provi, Nombre, Pais)
+values (1, 'Avila' , 'España');
+select * from PROVINCIAS;
+
+
+
