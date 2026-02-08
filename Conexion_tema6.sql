@@ -96,10 +96,154 @@ create table EMPLEADOS
     Salario number(7,2) constraint EMPLEADOS_NOM_CH check (salario>0),
     
     -- claves ajenas
-    Cod_provi number(2)constraint EMPLEADOS_PROVCOD_FK foreign key (Cod_provi)
-        references PROVINICIAS(Cod_provi) on delete cascade, --si se elimina el"padre" se eliminan los "hijos"
+    Cod_provi number(2)constraint EMPLEADOS_PROVCOD_FK
+        references PROVINCIAS(Cod_provi) on delete cascade, --si se elimina el"padre" se eliminan los "hijos"
     
-    Cod_empre number(2) constraint EMPLEADOS_EMPRECOD_FK foreign key (Cod_empre)   
+    Cod_empre number(2) constraint EMPLEADOS_EMPRECOD_FK  
         references EMPRESAS(Cod_empre)
 
+);
+
+                    -- insertamos --
+/*insert into EMPLEADOS (Cod_emple, nombre, apellido, salario)
+values (300, 'Veronica', 'Lopez', 3000);*/ -- ERROR PORQUE METES MAS VALORES DE LO PERMITIDO
+
+insert into EMPLEADOS (Cod_emple, nombre, apellido, salario)
+values (30, 'Veronica', 'Lopez', 3000); -- se inserta la fila
+
+/*insert into EMPLEADOS (Cod_emple, nombre, apellido, cod_empre, cod_provi)
+values (10, 'Sergio', 'Perez', 10, 1);*/ --ERROR PORQUE NO EXISTE LA EMPRESA 10
+
+insert into EMPLEADOS (Cod_emple, nombre, apellido, cod_empre, cod_provi)
+values (10, 'Sergio', 'Perez', 20, 1);
+
+
+/*6. Crea la tabla PROVINCIAS y PERSONAS con la estructura que se muestra a
+continuación, en negrita la clave principal y codprovin referencia a cod_provincia.
+Además pondremos la opción de BORRADO EN CASCADA.*/
+
+create table PROVINCIAS
+(
+    cod_provincia number(2) constraint PROVINCIAS_COD_PK primary key,
+    nom_provincia varchar(25) constraint PROVINCIAS_NOM_NN not null,
+    poblacion number(7)
+);
+
+
+create table PERSONAS
+(
+    dni varchar2(9) constraint PERSONAS_COD_PK primary key,
+    nombre varchar(10) constraint PERSONAS_NOM_NN not null,
+    direccion varchar2(25) constraint PERSONAS_DIR_NN not null,
+    codprovin number(2) constraint PERSONAS_PROV_FK 
+        references PROVINCIAS(cod_provincia) on delete cascade
+);
+
+
+
+-- ERROR EJ6 --
+
+
+/*7. Crear la tabla EJEMPLO1 y asignar a la columna fecha la fecha del sistema
+DNI VARCHAR2(10)
+NOMBRE VARCHAR2(30)
+EDAD NUMBER(2)
+FECHA DATE
+Insertar una fila con los valores siguientes, 1234, PEPA, 21 sin la columna fecha,
+comprobando después que efectivamente añade la fecha actual.
+*/
+
+create table EJEMPLO1
+(
+    dni varchar2(10) constraint EJEMPLO1_COD_PK primary key,
+    nombre varchar2(30) constraint EJEMPLO1_NOM_NN not null,
+    edad number(2) constraint EJEMPLO1_ED_NN not null,
+    fecha date default sysdate   
+        
+);
+
+insert into EJEMPLO1 (dni, nombre, edad)
+values (123, 'PEPA', 21);
+
+/*8. Crear la tabla EJEMPLO3 cuyas columnas y restricciones son las siguientes:
+DNI VARCHAR2(10)
+NOMBRE VARCHAR2(30)
+EDAD NUMBER(2)
+CURSO NUMBER
+Restricciones
+- El DNI no puede ser nulo
+- La clave principal es le DNI
+- La EDAD ha de estar comprendida entre 5 y 20 años
+- El NOMBRE ha de estar en mayúsculas
+- El curso sólo puede almacenar 1,2 o 3
+Insertar: las filas siguientes y si da error indicar por qué:
+1111 Pepe 4 1 (error) NOMBRE MAYÚSCULAS
+1111 PEPE 10 2
+2222 MARIA 12 5 (error) CURSO 1,2 O 3
+2222 MARIA 12 2*/
+
+create table EJEMPLO3 
+(       
+    dni varchar2(10) constraint EJEMPLO3_COD_PK primary key,
+    nombre varchar2(30) constraint EJEMPLO3_NOM_NN not null 
+        constraint EJEMPLO3_NOM_CH check (nombre = upper(nombre)),
+    edad number(2) constraint EJEMPLO3_ED_CH check (edad between 5 and 20),
+    curso number constraint EJEMPLO3_CUR_CH check (curso in (1,2,3))
+
+);
+
+/*insert into ejemplo3 (dni, nombre, edad, curso)
+values (1111, 'Pepe', 4, 1);*/ --ERROR PQ LA EDAD ES <5--
+
+insert into ejemplo3 (dni, nombre, edad, curso)
+values (1111, 'PEPE', 10,2);
+
+/*insert into ejemplo3 (dni, nombre, edad, curso)
+values (2222, 'MARIA', 12, 5);*/ --ERRO PQ EL CURSO ES != 1,2 O 3--
+
+insert into ejemplo3 (dni, nombre, edad, curso)
+values (2222, 'MARIA', 12, 2);
+
+
+/*9. Crea las tabla siguientes con lo campos y restricciones:
+ALUMNOS
+Codigo number (2 )PK
+Nombre varchar2(25) obligatorio
+MODULOS
+Codigo number PK,
+Nombre varchar2(25)
+NOTAS
+Cod_alumno number(2)
+Cod_modulo number
+Nota number(2),
+(Cod-alumno, modulo) es la clave primaria
+Nota ha de ser un número comprendido entre 0 y 10
+Debe además tener dos campos que hacen referencia a la tabla MODULOS y
+ALUMNOS*/
+
+create table ALUMNO 
+(
+
+    cod_alum number(2) constraint ALUMNO_COD_PK primary key,
+    nombre varchar2(25) constraint ALUMNO_NOM_NN not null
+
+);
+
+create table modulos
+(
+
+    cod_mod number constraint MODULOS_COD_PK primary key,
+    nombre varchar2(25)
+
+);
+
+create table NOTAS (
+    cod_alumn  number(2),
+    cod_modulo number,
+    nota number(2) constraint NOTAS_NOTA_CH check (nota BETWEEN 0 AND 10),
+    -- Definimos la clave primaria compuesta (los dos juntos no pueden repetirse)
+    CONSTRAINT NOTAS_PK PRIMARY KEY (cod_alumn, cod_modulo),
+    -- Definimos las claves ajenas
+    CONSTRAINT NOTAS_ALU_FK FOREIGN KEY (cod_alumn) REFERENCES ALUMNO(cod_alum),
+    CONSTRAINT NOTAS_MOD_FK FOREIGN KEY (cod_modulo) REFERENCES MODULOS(cod_mod)
 );
